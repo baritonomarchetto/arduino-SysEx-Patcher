@@ -49,7 +49,6 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 byte MIDI_CHANNEL = 1;
 byte MIDI2_CHANNEL = 2;
 
-byte genericCCoffset = 11;
 byte page = 0;
 byte globalMode = 0;          //0 - patcher/controller, 1 - sequencer
 long randnumber;
@@ -150,6 +149,11 @@ int MX6Tones[PAGES][POTS_NUM] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 const int MX6Par[PAGES][POTS_NUM] = {{0, 1, 2, 3, 4, 5, 6, 10, 11, 12, 13, 14, 15, 16, 20, 21},
                                      {22, 24, 30, 40, 41, 48, 50, 51, 52, 53, 54, 55, 57, 58, 60, 61},
                                      {62, 63, 64, 65, 67, 68, 80, 82, 83, 84, 86, 90, 92, 93, 94, 96}};
+
+//Control Change message numbers layout
+const byte CCLayout[PAGES][POTS_NUM] = {{20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35},
+                                       {36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 60, 61, 62},
+                                       {63, 64, 70, 71, 72, 73, 75, 80, 81, 82, 83, 84, 85, 86, 87, 90}};
 
 int prevSequence[POTS_NUM] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; 
 int sequence[POTS_NUM] =     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -392,7 +396,7 @@ for (byte i = 0; i < POTS_NUM; i++){
           break;
         }
         case 5: {//Generic CC
-          MIDI.sendControlChange(i+(POTS_NUM*page)+genericCCoffset, lastParVal[page][i], MIDI_CHANNEL);
+          MIDI.sendControlChange(CCLayout[page][i], lastParVal[page][i], MIDI_CHANNEL);
           break;
         }
       }
@@ -527,7 +531,7 @@ else if(millis()-bDeb[1] > dbtime && digitalRead(butLayout[1]) != bState[1]){
           MIDI.sendControlChange(i+(POTS_NUM*page)+2, lastParVal[j][i], MIDI_CHANNEL);
         }
         else if(synth == 5){//GENERIC_CC
-          MIDI.sendControlChange(i+(POTS_NUM*j)+genericCCoffset, lastParVal[j][i], MIDI_CHANNEL);
+          MIDI.sendControlChange(CCLayout[j][i], lastParVal[j][i], MIDI_CHANNEL);
         }
       }
     }
@@ -574,7 +578,7 @@ else if(millis()-bDeb[2] > dbtime && digitalRead(butLayout[2]) != bState[2]){
               break;
             }
             case 5: {//GENERIC_CC
-            MIDI.sendControlChange(i+(POTS_NUM*j)+genericCCoffset, randnumber, MIDI_CHANNEL);
+            MIDI.sendControlChange(CCLayout[j][i], randnumber, MIDI_CHANNEL);
             break;
             }
           }
@@ -679,7 +683,7 @@ if(globalMode == 1){
       digitalWrite(LEDLayout[2], HIGH); 
       digitalWrite(LEDLayout[3], LOW);
     }
-    else {
+    else { //step > 12
       digitalWrite(LEDLayout[0], LOW); 
       digitalWrite(LEDLayout[1], LOW); 
       digitalWrite(LEDLayout[2], LOW); 
@@ -737,11 +741,11 @@ if(millis()-bDeb[1] > dbtime && digitalRead(butLayout[1]) != bState[1]){//START 
     START = !START; 
     if(START == 0){//STOP
       Step = 0;
-      PANIC();
       digitalWrite(LEDLayout[0], HIGH); 
       digitalWrite(LEDLayout[1], HIGH); 
       digitalWrite(LEDLayout[2], HIGH); 
       digitalWrite(LEDLayout[3], HIGH);
+      PANIC();
     }
     else if(START == 1){//START
       digitalWrite(LEDLayout[0], HIGH); 
@@ -865,7 +869,7 @@ if(activeShiftFunc[5] == 1 && synthVal!= synth) {
 /////////////////////////////////////
 //PANIC!
 void PANIC(){
-digitalWrite(LEDLayout[2], HIGH);
+//digitalWrite(LEDLayout[2], HIGH);
 //FULL PANIC
 for(int j = 0; j < 16; j++){
 MIDI.sendControlChange(123, 0, j);
@@ -874,9 +878,9 @@ for(int i = 20; i < 95; i++){
   MIDI.sendNoteOff(i,0, j);
 }
 }
-if(START == 1 || globalMode == 0) {
-digitalWrite(LEDLayout[2], LOW);
-}
+//if(START == 1 || globalMode == 0) {
+//digitalWrite(LEDLayout[2], LOW);
+//}
 }
 
 /////////////////////////////////
