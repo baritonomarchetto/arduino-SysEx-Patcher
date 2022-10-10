@@ -12,7 +12,12 @@
  * The modulation matrix cannot be controlled via MIDI. You are in the need for ver. 2.14/2.15 and set System Enable 
  * Master parameter to "3". IMPORTANT: set the synth in "quick" edit mode, or sysex messages will be ignored.
  * 
- * Detailed informations about hardware and software are reported in the dedicated Instructable (LINK).
+ * Detailed informations about hardware and software are reported in the dedicated Instructable 
+ * https://www.instructables.com/MIDI-SysEx-Patcher-Ver2/
+ * 
+ * requires Francois Best's MIDI library (download from arduino IDE's library manager)
+ * requires Adafruit GFX library (download from arduino IDE's library manager)
+ * requires Adafruit SSD1306 library (download from arduino IDE's library manager)
  *   
  * by Barito, 2018/2022
  * (last update - jan 2022)
