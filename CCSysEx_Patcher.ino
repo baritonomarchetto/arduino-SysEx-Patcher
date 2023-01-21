@@ -191,7 +191,6 @@ BPM = 120;
 res = 2; //steps are 1/16 note lenght
 divisor = 4;
 stepLenght = 60000/BPM/divisor;
-PANIC();
 randomSeed(analogRead(0));    //the seed is a function of the value of pin A0 at start
 //define MIDI functions
 MIDI.setHandleNoteOn(Handle_Note_On);
@@ -200,6 +199,7 @@ MIDI.setHandleControlChange(Handle_CC);
 MIDI.setHandlePitchBend(Handle_PB);
 //start MIDI
 MIDI.begin(MIDI_CHANNEL_OMNI); //start MIDI and listen to ALL MIDI channels
+PANIC();
 #ifdef DISABLE_THRU
 MIDI.turnThruOff();
 #endif
